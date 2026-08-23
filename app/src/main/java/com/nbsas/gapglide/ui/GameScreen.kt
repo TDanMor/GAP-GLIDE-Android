@@ -14,8 +14,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -172,7 +174,7 @@ fun GameScreen(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .safeDrawingPadding()
-                    .padding(top = 16.dp),
+                    .padding(top = 32.dp),
                 style = MaterialTheme.typography.displayLarge.copy(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 120.sp
@@ -226,6 +228,7 @@ fun GameScreen(
                             val isSelected = gameState.difficulty == difficulty
                             Button(
                                 onClick = { gameState = gameState.copy(difficulty = difficulty) },
+                                modifier = Modifier.heightIn(min = 48.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                                 ),
@@ -241,17 +244,23 @@ fun GameScreen(
                     }
                     
                     Spacer(modifier = Modifier.height(32.dp))
-                    Button(onClick = {
-                        gameState = gameState.copy(
-                            status = GameStatus.PLAYING,
-                            currentScore = 0,
-                            playerY = screenHeight / 2,
-                            playerVelocity = 0f,
-                            obstacles = emptyList()
-                        )
-                    }) {
+                    Button(
+                        onClick = {
+                            gameState = gameState.copy(
+                                status = GameStatus.PLAYING,
+                                currentScore = 0,
+                                playerY = screenHeight / 2,
+                                playerVelocity = 0f,
+                                obstacles = emptyList()
+                            )
+                        },
+                        modifier = Modifier
+                            .heightIn(min = 48.dp)
+                            .widthIn(min = 200.dp)
+                    ) {
                         Text(text = "Play", fontSize = 24.sp)
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
@@ -308,7 +317,10 @@ fun GameScreen(
                                 obstacles = emptyList()
                             )
                         },
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .heightIn(min = 48.dp)
+                            .widthIn(min = 200.dp)
                     ) {
                         Text(text = "Restart", fontSize = 24.sp)
                     }
@@ -322,12 +334,16 @@ fun GameScreen(
                                 obstacles = emptyList()
                             )
                         },
+                        modifier = Modifier
+                            .heightIn(min = 48.dp)
+                            .widthIn(min = 200.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.secondary
                         )
                     ) {
                         Text(text = "Main Menu", fontSize = 24.sp)
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
         }
