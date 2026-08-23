@@ -172,7 +172,7 @@ Tasks:
 1. [x] Run debug build on a physical device.
 2. [x] Complete the device test checklist in Section 6.
 3. Record and fix actual bugs only. (None observed so far).
-4. Build and install a signed release APK for private testing.
+4. Build and install a signed release APK for private testing. (Deferred until after Milestone 1 polish).
 5. Make a Git commit for every verified bug fix.
 
 Definition of done:
@@ -382,9 +382,10 @@ The agent must:
 
 ## 10. Current Next Actions
 
-1. Create a signed release APK for private device testing.
-2. Create a private GitHub repository and push the verified Git history.
-3. Plan the first polish task: custom adaptive launcher icon.
+1. Milestone 1.1: Custom adaptive launcher icon.
+2. Milestone 0.5: Private GitHub repository backup.
+3. Milestone 0.4: Signed release APK (Deferred until after Milestone 1 polish).
+4. Milestone 2: Signed release APK and AAB preparation.
 
 ## 11. Change Log
 
@@ -395,5 +396,6 @@ The agent must:
 | 2026-08-23 | Removed Internet permission and unused dependencies; release shrinking enabled. | Completed |
 | 2026-08-23 | Initial local Git commit created: `f18be3562d6cc8f989a45952a8868a2f4027a9e1`. | Completed |
 | 2026-08-23 | Physical-device validation on OnePlus 9: Pass. No bugs observed. | Completed |
+| 2026-08-23 | Custom adaptive launcher icon implemented and verified on OnePlus 9. | Completed |
 | TBD | Signed release APK. | Pending |
 | TBD | Private Git remote backup. | Pending |

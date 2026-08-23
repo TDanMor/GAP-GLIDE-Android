@@ -51,7 +51,7 @@
 - [x] Update `GAP_GLIDE_MASTER_PLAN.md` with OnePlus 9 validation result.
 - [x] Commit the validation documentation with message: `Record OnePlus 9 device validation`.
 
-### 0.4 Signed Release Test — Next
+### 0.4 Signed Release Test — Next (Deferred until after Milestone 1 polish)
 
 - [ ] Create a signing keystore outside the Git repository.
 - [ ] Securely store keystore file, alias, passwords, and recovery details outside Git.
@@ -79,11 +79,11 @@
 
 ### 1.1 App Identity
 
-- [ ] Plan a minimalist adaptive launcher icon: two obstacle bars with a small player circle in the gap.
-- [ ] Create adaptive foreground/background icon assets.
-- [ ] Replace default Android launcher icon.
-- [ ] Test the icon on the OnePlus 9 launcher and at different mask shapes if available.
-- [ ] Commit the icon task separately.
+- [x] Plan a minimalist adaptive launcher icon: two obstacle bars with a small player circle in the gap.
+- [x] Create adaptive foreground/background icon assets.
+- [x] Replace default Android launcher icon.
+- [x] Test the icon on the OnePlus 9 launcher and at different mask shapes if available.
+- [~] Commit the icon task separately.
 
 ### 1.2 Gameplay Tuning
 
@@ -112,7 +112,7 @@
 
 ---
 
-## Milestone 2 — Private and Play Release Readiness
+## Milestone 2 — Store Release Readiness
 
 **Goal:** Prepare a distribution-quality release without introducing online features.
 
@@ -141,7 +141,6 @@
 
 ### 2.4 Release Artifacts and Testing
 
-- [ ] Build a signed release APK for private testers.
 - [ ] Build a signed Android App Bundle (`.aab`) for Google Play.
 - [ ] Upload the AAB to Google Play internal testing.
 - [ ] Add trusted testers.
@@ -153,74 +152,4 @@
 ---
 
 ## Milestone 3 — Offline Content Expansion
-
-**Goal:** Increase replay value without changing the offline-first product promise.
-
-- [ ] Add visual theme palettes.
-- [ ] Add alternative backgrounds and obstacle styles using lightweight Canvas drawing.
-- [ ] Add locally stored cosmetic unlocks only if their implementation stays small.
-- [ ] Add local challenge objectives or achievement-style milestones.
-- [ ] Consider a custom difficulty setting only after the three presets are balanced.
-- [ ] Review performance and APK size after every content addition.
-
-**Planning rule:** Each item must be separately planned and approved. Do not add multiple features in one agent task.
-
----
-
-## Milestone 4 — Monetisation Decision [!]
-
-**Goal:** Decide whether to monetise only after gameplay and private/public testing show the game is enjoyable.
-
-Possible directions:
-
-- [ ] One-time paid application.
-- [ ] Cosmetic-only optional purchases.
-- [ ] Optional rewarded ads.
-- [ ] Paid ad-removal option.
-
-Before implementing any option:
-
-- [ ] Create a new architecture and privacy plan.
-- [ ] Reassess the no-Internet rule.
-- [ ] Reassess Data Safety disclosures, dependencies, permissions, testing, and user consent requirements.
-- [ ] Ensure no pay-to-win or forced advertisement design.
-
----
-
-## Milestone 5 — Original Advanced Vision [!]
-
-**Goal:** Evaluate the larger original concept as a separate product phase.
-
-Original ideas deferred from MVP:
-
-- [ ] Campaign mode with 20+ stages.
-- [ ] More scenario/theme packs.
-- [ ] Bot opponents with multiple difficulty levels.
-- [ ] Local multiplayer for 2–8 people.
-- [ ] LAN, hotspot, Bluetooth, Wi-Fi Direct, or room-code joining.
-- [ ] Mixed human-plus-bot modes.
-- [ ] Anonymous online leaderboard.
-- [ ] Android monetisation and web/iOS PWA strategy.
-
-Before starting any of these:
-
-- [ ] Create a new planning document.
-- [ ] Decide whether native Compose remains appropriate or whether architecture/platform direction should change.
-- [ ] Estimate technical cost, privacy impact, testing matrix, and maintenance burden.
-- [ ] Obtain explicit approval for the new scope.
-
----
-
-## Global Definition of Done
-
-For every task:
-
-1. The task is explicitly approved.
-2. Only planned files are modified.
-3. The relevant app build succeeds.
-4. Manual testing is completed where applicable.
-5. Gemini reports actual build output, warnings, and known limitations.
-6. `git status` is reviewed.
-7. No secrets or generated release artifacts are staged.
-8. A focused commit is created only with explicit approval.
-9. The master plan or task list is updated only for meaningful milestone progress.
+...
