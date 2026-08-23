@@ -279,7 +279,14 @@ fun GameScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.error
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "${gameState.difficulty.name} MODE",
+                        fontSize = 18.sp,
+                        color = Color.White.copy(alpha = 0.7f),
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Score: ${gameState.currentScore}",
                         fontSize = 24.sp,
