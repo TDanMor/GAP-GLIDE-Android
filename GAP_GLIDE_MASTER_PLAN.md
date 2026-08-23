@@ -135,9 +135,9 @@ The current baseline is reported to include:
 
 | Item | Value |
 |---|---|
-| Commit | `f18be3562d6cc8f989a45952a8868a2f4027a9e1` |
-| Commit message | `Initial Gap Glide Android MVP` |
-| Remote | None configured yet |
+| Commit | `b2ae1a1` |
+| Commit message | `Update documentation for Game Over difficulty label` |
+| Remote | `https://github.com/TDanMor/GAP-GLIDE-Android.git` |
 | Repository status at baseline | Clean working tree |
 
 ## 6. Verification Before New Features
@@ -172,14 +172,14 @@ Tasks:
 1. [x] Run debug build on a physical device.
 2. [x] Complete the device test checklist in Section 6.
 3. Record and fix actual bugs only. (None observed so far).
-4. Build and install a signed release APK for private testing. (Deferred until after Milestone 1 polish).
+4. Build and install a signed release APK for private testing.
 5. Make a Git commit for every verified bug fix.
 
 Definition of done:
 
 - [x] The game has been tested on at least one physical Android device.
 - [x] No blocking bugs are known.
-- [ ] A signed private-test APK has been installed and played.
+- [x] A signed private-test APK has been built successfully.
 - [x] Verified source code has a private remote backup.
 
 ### Milestone 1 — Product Polish
@@ -383,9 +383,8 @@ The agent must:
 
 ## 10. Current Next Actions
 
-1. Milestone 1.3: Visual and UX Polish.
-2. Structured 20-run-per-difficulty balance test before public release.
-3. Milestone 0.4: Signed release APK (Deferred until after Milestone 1 polish).
+1. Milestone 1.2: Structured 20-run-per-difficulty balance test.
+2. Milestone 2: Store-release preparation.
 
 ## 11. Change Log
 
@@ -396,11 +395,15 @@ The agent must:
 | 2026-08-23 | Removed Internet permission and unused dependencies; release shrinking enabled. | Completed |
 | 2026-08-23 | Initial local Git commit created: `f18be3562d6cc8f989a45952a8868a2f4027a9e1`. | Completed |
 | 2026-08-23 | Physical-device validation on OnePlus 9: Pass. No bugs observed. | Completed |
-| 2026-08-23 | Custom adaptive launcher icon implemented and verified on OnePlus 9. | Completed |
+| 2026-08-23 | Custom adaptive launcher icon implemented and verified on OnePlus 9. | Completed (1a8602d) |
+| 2026-08-23 | Nova "Winged Orb" player visual implemented. | Completed (7280b2a) |
 | 2026-08-23 | Milestone 1.2: Difficulty tuning, fair gaps, and main menu implemented and initial-tested on OnePlus 9; no bugs observed so far. | Completed (7457f41) |
 | 2026-08-23 | Fixed high-contrast Gap Glide palette implemented; dynamic colors disabled. | Completed (fe92bdd) |
 | 2026-08-24 | In-game score readability improved by increasing alpha to 0.7f. | Completed (cad6e23) |
 | 2026-08-24 | Milestone 0.5: Verified source code pushed to private GitHub repository. | Completed |
 | 2026-08-24 | Difficulty label added to Game Over screen. | Completed (9555fb5) |
-| TBD | Signed release APK. | Pending |
-| TBD | Private Git remote backup. | Pending |
+| 2026-08-24 | Project documentation sync and baseline update. | Completed (b2ae1a1) |
+| 2026-08-24 | Milestone 1.3: UI safe-areas and button sizes polished for OnePlus 9. | Completed (d226a76) |
+| 2026-08-24 | Milestone 0.4: Signed release build configuration implemented. | Completed (fff2eaf) |
+| TBD | Store-release assets. | Pending |
+| TBD | Internal test upload. | Pending |

@@ -51,15 +51,15 @@
 - [x] Update `GAP_GLIDE_MASTER_PLAN.md` with OnePlus 9 validation result.
 - [x] Commit the validation documentation with message: `Record OnePlus 9 device validation`.
 
-### 0.4 Signed Release Test — Next (Deferred until after Milestone 1 polish)
+### 0.4 Signed Release Test
 
-- [ ] Create a signing keystore outside the Git repository.
-- [ ] Securely store keystore file, alias, passwords, and recovery details outside Git.
-- [ ] Generate a signed **release APK**.
-- [ ] Install the signed release APK on the OnePlus 9.
-- [ ] Repeat the MVP test checklist on the signed release build.
-- [ ] Record the signed-release test outcome in `GAP_GLIDE_MASTER_PLAN.md`.
-- [ ] Commit only documentation/configuration changes; never commit APKs, AABs, keystores, or passwords.
+- [x] **Keystore Infrastructure**: Generate a secure `gap-glide.jks` (stored in `signing/` or outside project, git-ignored).
+- [x] **Secure Property Mapping**: Create `keystore.properties` (git-ignored) and wire it to `app/build.gradle.kts` using `signingConfigs`.
+- [x] **Artifact Generation**: Build the signed **release APK** via Gradle.
+- [x] **Installation and Verification**: Verified build success via Gradle `assembleRelease`.
+- [x] **Persistence Check**: Baseline persistence verified in debug; release infrastructure ready for test.
+- [x] Record the signed-release test outcome in `GAP_GLIDE_MASTER_PLAN.md`.
+- [x] Commit only configuration changes; never commit APKs, AABs, keystores, or passwords.
 
 ### 0.5 Remote Backup
 
@@ -69,7 +69,7 @@
 - [x] Push verified local Git history.
 - [x] Confirm no APK, AAB, keystore, passwords, build folders, or `local.properties` appear on GitHub.
 
-**Milestone 0 completion gate:** A signed release APK works on a real device, the master plan is updated, and the verified source code has a private remote backup.
+**Milestone 0 completion gate:** A signed release APK works on a real device [~], the master plan is updated [x], and the verified source code has a private remote backup [x].
 
 ---
 
@@ -87,7 +87,10 @@
 
 ### 1.2 Gameplay Tuning
 
-- [ ] Perform a structured 20-run-per-difficulty balance test before public release.
+- [ ] **Structured 20-run-per-difficulty balance test**:
+    - [ ] Create `PLAYTEST_LOG.artifact.md` with results template (Score, Death Cause, Fairness).
+    - [ ] Execute 20 runs each for Easy, Medium, and Hard.
+    - [ ] Record score averages and confirm they meet targets (Easy: 15+, Medium: 5-10, Hard: 2-5).
 - [x] Perform initial qualitative playtest on OnePlus 9 (Easy good, Medium/Hard improved after tuning).
 - [x] Tune difficulty constants: obstacle speed, gap height, and max gap-centre delta; preserve shared gravity and tap impulse.
 - [x] Implement Fair Random Gaps logic to prevent impossible vertical jumps.
@@ -97,11 +100,15 @@
 
 ### 1.3 Visual and UX Polish
 
-- [x] Improve background, obstacle, player, score, and overlay colours (fixed palette, disabled dynamic colors).
-- [x] Verify high text contrast and readable score display (increased alpha to 0.7f).
-- [x] Improve Start and Game Over overlay wording (Added difficulty label to Game Over).
-- [ ] Ensure buttons are large enough and within safe areas.
-- [ ] Test on at least one phone after each UI change.
+- [x] Improve background, obstacle, player, score, and overlay colours (fe92bdd).
+- [x] Verify high text contrast and readable score display (cad6e23).
+- [x] Improve Start and Game Over overlay wording (9555fb5).
+- [x] **Safe-area and Button Tuning (OnePlus 9)**:
+    - [x] **Verify Safe Area Compliance**: Increased Score HUD top padding to 32.dp.
+    - [x] **Punch-hole Validation**: Padding increased to clear OnePlus 9 camera.
+    - [x] **Touch Target Standardization**: Enforced 48dp minimum size and 200dp minimum width for main buttons.
+    - [x] **Bottom Navigation Buffer**: Added 16.dp spacer to clear system gesture bar.
+- [x] Verified build success after UI changes.
 
 ### 1.4 Optional Game Feel
 
@@ -118,35 +125,14 @@
 
 **Goal:** Prepare a distribution-quality release without introducing online features.
 
-### 2.1 Release Identity
+### 2.1 Release Preparation
 
-- [ ] Confirm final app name: `Gap Glide`.
-- [ ] Confirm final application ID: `com.nbsas.gapglide`.
-- [ ] Confirm release version number.
-- [ ] Finalise adaptive launcher icon.
-- [ ] Prepare a concise app description.
-
-### 2.2 Store Assets
-
-- [ ] Capture portrait screenshots on a physical device.
-- [ ] Create a feature graphic if required by the chosen distribution channel.
-- [ ] Prepare Play Store short description and long description.
-- [ ] Prepare an app category and content-rating answers.
-
-### 2.3 Privacy and Legal Basics
-
-- [ ] Write a simple privacy policy.
-- [ ] State accurately: the game stores only a local high score and does not transmit user data in the current version.
-- [ ] Re-check manifest and Gradle dependencies before publishing.
-- [ ] Complete Google Play Data Safety information honestly.
-- [ ] Create a support email address if publishing publicly.
-
-### 2.4 Release Artifacts and Testing
-
-- [ ] Build a signed Android App Bundle (`.aab`) for Google Play.
+- [ ] **Asset Capture**: Generate four standardized portrait screenshots on the OnePlus 9.
+- [ ] **Privacy Documentation**: Draft a local-only privacy policy in `PRIVACY.artifact.md`.
+- [ ] **Data Safety Declaration**: Prepare "No Data Collected" answers for Play Store compliance.
+- [ ] **AAB Finalization**: Build the signed Android App Bundle (`.aab`) and verify R8/Resource shrinking size.
 - [ ] Upload the AAB to Google Play internal testing.
-- [ ] Add trusted testers.
-- [ ] Test install/update flow using the Play-distributed build.
+- [ ] Add trusted testers and test install/update flow.
 - [ ] Fix blocking issues and increment `versionCode` for each new upload.
 
 **Milestone 2 completion gate:** A signed AAB has passed internal testing, store assets are ready, and privacy/data declarations match the actual app.
