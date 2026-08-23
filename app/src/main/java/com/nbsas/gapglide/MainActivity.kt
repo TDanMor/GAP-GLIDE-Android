@@ -11,6 +11,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.lifecycleScope
 import com.nbsas.gapglide.ui.GameScreen
@@ -23,11 +24,21 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 class MainActivity : ComponentActivity() {
 
     private val highScoreKey = intPreferencesKey("high_score")
-    private val highScoreFlow by lazy {
-        dataStore.data
-            .map { preferences ->
-                preferences[highScoreKey] ?: 0
-            }
+    private val selectedSceneKey = stringPreferencesKey("selected_scene")
+    private val selectedAvatarKey = stringPreferencesKey("selected_avatar")
+
+    private val settingsFlow by lazy {
+        dataStore.data.map { preferences ->
+            val highScore = preferences[highScoreKey] ?: 0
+            val sceneName = preferences[selectedSceneKey] ?: SceneType.TAJ_MAHAL.name
+            val avatarName = preferences[selectedAvatarKey] ?: AvatarType.NOVA.name
+            
+            Triple(
+                highScore,
+                try { SceneType.valueOf(sceneName) } catch (e: Exception) { SceneType.TAJ_MAHAL },
+                try { AvatarType.valueOf(avatarName) } catch (e: Exception) { AvatarType.NOVA }
+            )
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,12 +46,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val highScore by highScoreFlow.collectAsState(initial = 0)
+            val settings by settingsFlow.collectAsState(initial = Triple(0, SceneType.TAJ_MAHAL, AvatarType.NOVA))
             GapGlideTheme {
                 GameScreen(
-                    highScore = highScore,
+                    highScore = settings.first,
+                    initialScene = settings.second,
+                    initialAvatar = settings.third,
                     onNewHighScore = { newScore ->
                         saveHighScore(newScore)
+                    },
+                    onSceneChanged = { scene ->
+                        saveSetting(selectedSceneKey, scene.name)
+                    },
+                    onAvatarChanged = { avatar ->
+                        saveSetting(selectedAvatarKey, avatar.name)
                     }
                 )
             }
@@ -54,6 +73,14 @@ class MainActivity : ComponentActivity() {
                 if (score > currentHigh) {
                     settings[highScoreKey] = score
                 }
+            }
+        }
+    }
+
+    private fun <T> saveSetting(key: Preferences.Key<T>, value: T) {
+        lifecycleScope.launch {
+            dataStore.edit { settings ->
+                settings[key] = value
             }
         }
     }

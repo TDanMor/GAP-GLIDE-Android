@@ -1,5 +1,6 @@
 package com.nbsas.gapglide.ui
 
+import android.app.Activity
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -7,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,7 +19,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -37,23 +42,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.nbsas.gapglide.AvatarType
 import com.nbsas.gapglide.Difficulty
 import com.nbsas.gapglide.GameEngine
 import com.nbsas.gapglide.GameState
 import com.nbsas.gapglide.GameStatus
+import com.nbsas.gapglide.SceneType
+import com.nbsas.gapglide.ui.PixelArtLibrary.drawAvatar
+import com.nbsas.gapglide.ui.PixelArtLibrary.drawHeritageBackground
+import com.nbsas.gapglide.ui.PixelArtLibrary.drawThemedObstacle
 import com.nbsas.gapglide.ui.theme.GapGlideTheme
 
 @Composable
 fun GameScreen(
     modifier: Modifier = Modifier,
     highScore: Int = 0,
-    onNewHighScore: (Int) -> Unit = {}
+    initialScene: SceneType = SceneType.TAJ_MAHAL,
+    initialAvatar: AvatarType = AvatarType.NOVA,
+    onNewHighScore: (Int) -> Unit = {},
+    onSceneChanged: (SceneType) -> Unit = {},
+    onAvatarChanged: (AvatarType) -> Unit = {}
 ) {
-    var gameState by remember { mutableStateOf(GameState(highScore = highScore)) }
+    var gameState by remember { 
+        mutableStateOf(GameState(
+            highScore = highScore,
+            selectedScene = initialScene,
+            selectedAvatar = initialAvatar
+        )) 
+    }
     var screenWidth by remember { mutableStateOf(0f) }
     var screenHeight by remember { mutableStateOf(0f) }
 
@@ -98,8 +119,7 @@ fun GameScreen(
         }
     }
 
-    val obstacleColor = MaterialTheme.colorScheme.primary
-    val playerColor = MaterialTheme.colorScheme.secondary
+    val context = LocalContext.current
 
     Box(
         modifier = modifier
@@ -120,50 +140,39 @@ fun GameScreen(
         // Game Canvas (Base layer)
         Canvas(modifier = Modifier.fillMaxSize()) {
             if (gameState.status != GameStatus.START) {
+                // Background Layer
+                drawHeritageBackground(gameState.selectedScene)
+
                 val gapHeight = gameState.difficulty.gapHeight
                 // Draw Obstacles
                 gameState.obstacles.forEach { obstacle ->
                     // Top pipe
-                    drawRect(
-                        color = obstacleColor,
-                        topLeft = Offset(obstacle.x, 0f),
-                        size = Size(GameState.OBSTACLE_WIDTH, obstacle.gapY - gapHeight / 2)
+                    drawThemedObstacle(
+                        scene = gameState.selectedScene,
+                        x = obstacle.x,
+                        y = 0f,
+                        width = GameState.OBSTACLE_WIDTH,
+                        height = obstacle.gapY - gapHeight / 2,
+                        isTop = true
                     )
                     // Bottom pipe
-                    drawRect(
-                        color = obstacleColor,
-                        topLeft = Offset(obstacle.x, obstacle.gapY + gapHeight / 2),
-                        size = Size(GameState.OBSTACLE_WIDTH, size.height - (obstacle.gapY + gapHeight / 2))
+                    drawThemedObstacle(
+                        scene = gameState.selectedScene,
+                        x = obstacle.x,
+                        y = obstacle.gapY + gapHeight / 2,
+                        width = GameState.OBSTACLE_WIDTH,
+                        height = size.height - (obstacle.gapY + gapHeight / 2),
+                        isTop = false
                     )
                 }
 
-                // Draw Player (Nova - Winged Orb)
-                val cx = size.width / 2
-                val cy = gameState.playerY
-                val radius = GameState.PLAYER_RADIUS
-
-                // Core Body
-                drawCircle(
-                    color = playerColor,
-                    radius = radius,
-                    center = Offset(cx, cy)
+                // Draw Player
+                drawAvatar(
+                    avatar = gameState.selectedAvatar,
+                    x = size.width / 2,
+                    y = gameState.playerY,
+                    radius = GameState.PLAYER_RADIUS
                 )
-
-                // Wing Details (Symmetric, swept-back, inside radius)
-                val wingColor = Color.White.copy(alpha = 0.6f)
-                val wingPath = Path().apply {
-                    // Top Wing
-                    moveTo(cx + radius * 0.3f, cy - radius * 0.2f)
-                    lineTo(cx - radius * 0.7f, cy - radius * 0.5f)
-                    lineTo(cx - radius * 0.4f, cy - radius * 0.1f)
-                    close()
-                    // Bottom Wing
-                    moveTo(cx + radius * 0.3f, cy + radius * 0.2f)
-                    lineTo(cx - radius * 0.7f, cy + radius * 0.5f)
-                    lineTo(cx - radius * 0.4f, cy + radius * 0.1f)
-                    close()
-                }
-                drawPath(path = wingPath, color = wingColor)
             }
         }
 
@@ -211,16 +220,16 @@ fun GameScreen(
                         fontSize = 20.sp,
                         color = Color.White.copy(alpha = 0.7f)
                     )
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     
                     // Difficulty Selection
                     Text(
-                        text = "Select Difficulty",
-                        fontSize = 18.sp,
+                        text = "Difficulty",
+                        fontSize = 14.sp,
                         color = Color.White,
                         fontWeight = FontWeight.Medium
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
@@ -228,22 +237,88 @@ fun GameScreen(
                             val isSelected = gameState.difficulty == difficulty
                             Button(
                                 onClick = { gameState = gameState.copy(difficulty = difficulty) },
-                                modifier = Modifier.heightIn(min = 48.dp),
+                                modifier = Modifier.heightIn(min = 40.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                                 ),
-                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 4.dp)
+                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                             ) {
                                 Text(
                                     text = difficulty.name,
-                                    fontSize = 14.sp,
+                                    fontSize = 12.sp,
                                     color = if (isSelected) MaterialTheme.colorScheme.onPrimary else Color.White
                                 )
                             }
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Scene Selection
+                    Text(
+                        text = "Choose Scene",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier
+                            .widthIn(max = 300.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        SceneType.entries.forEach { scene ->
+                            val isSelected = gameState.selectedScene == scene
+                            Button(
+                                onClick = { 
+                                    gameState = gameState.copy(selectedScene = scene)
+                                    onSceneChanged(scene)
+                                },
+                                modifier = Modifier.heightIn(min = 40.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isSelected) MaterialTheme.colorScheme.secondary else Color.DarkGray
+                                )
+                            ) {
+                                Text(text = scene.displayName, fontSize = 12.sp)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Avatar Selection
+                    Text(
+                        text = "Choose Character",
+                        fontSize = 14.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier
+                            .widthIn(max = 300.dp)
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        AvatarType.entries.forEach { avatar ->
+                            val isSelected = gameState.selectedAvatar == avatar
+                            Button(
+                                onClick = { 
+                                    gameState = gameState.copy(selectedAvatar = avatar)
+                                    onAvatarChanged(avatar)
+                                },
+                                modifier = Modifier.heightIn(min = 40.dp),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = if (isSelected) MaterialTheme.colorScheme.tertiary else Color.DarkGray
+                                )
+                            ) {
+                                Text(text = avatar.displayName, fontSize = 12.sp)
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(24.dp))
                     Button(
                         onClick = {
                             gameState = gameState.copy(
@@ -259,6 +334,18 @@ fun GameScreen(
                             .widthIn(min = 200.dp)
                     ) {
                         Text(text = "Play", fontSize = 24.sp)
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { (context as? Activity)?.finish() },
+                        modifier = Modifier
+                            .heightIn(min = 48.dp)
+                            .widthIn(min = 200.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Red.copy(alpha = 0.6f)
+                        )
+                    ) {
+                        Text(text = "Exit Game", fontSize = 20.sp)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                 }
