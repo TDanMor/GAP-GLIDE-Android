@@ -1,0 +1,43 @@
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.gradle/
+build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+*.swp
+*~
+.DS_Store
+
+# Local configuration
+local.properties
+signing/
+keystore.properties
+*.jks
+*.keystore
+.env
+
+# Build outputs
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+
+# Merged Manifests
+app/src/main/AndroidManifest.xml.bak
+
+# Google Services
+google-services.json
+
+# Crashlytics
+com_google_firebase_crashlytics_*.json
+
+# AI Assistant metadata
+.agent/
+.artifacts/
