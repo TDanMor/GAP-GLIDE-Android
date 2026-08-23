@@ -83,15 +83,17 @@
 - [x] Create adaptive foreground/background icon assets.
 - [x] Replace default Android launcher icon.
 - [x] Test the icon on the OnePlus 9 launcher and at different mask shapes if available.
-- [~] Commit the icon task separately.
+- [x] Commit the icon task separately.
 
 ### 1.2 Gameplay Tuning
 
-- [ ] Play at least 20 runs on Easy, Medium, and Hard.
-- [ ] Record perceived difficulty, average score, unfair deaths, and control responsiveness.
-- [ ] Tune only documented constants: gravity, jump impulse, obstacle speed, spawn interval, and gap size.
-- [ ] Confirm each difficulty is visibly distinct and still fair.
-- [ ] Commit tuning separately.
+- [ ] Perform a structured 20-run-per-difficulty balance test before public release.
+- [x] Perform initial qualitative playtest on OnePlus 9 (Easy good, Medium/Hard improved after tuning).
+- [x] Tune difficulty constants: obstacle speed, gap height, and max gap-centre delta; preserve shared gravity and tap impulse.
+- [x] Implement Fair Random Gaps logic to prevent impossible vertical jumps.
+- [x] Add Main Menu and Android Back handling to Game Over overlay.
+- [x] Verify menu flow and state reset on OnePlus 9.
+- [x] Commit Milestone 1.2 separately (7457f41).
 
 ### 1.3 Visual and UX Polish
 

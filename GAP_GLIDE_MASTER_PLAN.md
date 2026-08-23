@@ -159,7 +159,7 @@ AI-generated implementation claims are not sufficient proof of device readiness.
 - [x] No red errors occur in Logcat during play.
 - [x] At least ten minutes of play produces no freeze, stutter, memory issue, or major overheating.
 
-**Validated on: OnePlus 9 (2026-08-23)**
+**Validated on: OnePlus 9 (2026-08-23) — Milestone 1.2 initial qualitative testing passed; no bugs observed.**
 
 ## 7. Delivery Roadmap
 
@@ -382,10 +382,10 @@ The agent must:
 
 ## 10. Current Next Actions
 
-1. Milestone 1.1: Custom adaptive launcher icon.
+1. Milestone 1.3: Visual and UX Polish.
 2. Milestone 0.5: Private GitHub repository backup.
-3. Milestone 0.4: Signed release APK (Deferred until after Milestone 1 polish).
-4. Milestone 2: Signed release APK and AAB preparation.
+3. Structured 20-run-per-difficulty balance test before public release.
+4. Milestone 0.4: Signed release APK (Deferred until after Milestone 1 polish).
 
 ## 11. Change Log
 
@@ -397,5 +397,6 @@ The agent must:
 | 2026-08-23 | Initial local Git commit created: `f18be3562d6cc8f989a45952a8868a2f4027a9e1`. | Completed |
 | 2026-08-23 | Physical-device validation on OnePlus 9: Pass. No bugs observed. | Completed |
 | 2026-08-23 | Custom adaptive launcher icon implemented and verified on OnePlus 9. | Completed |
+| 2026-08-23 | Milestone 1.2: Difficulty tuning, fair gaps, and main menu implemented and initial-tested on OnePlus 9; no bugs observed so far. | Completed (7457f41) |
 | TBD | Signed release APK. | Pending |
 | TBD | Private Git remote backup. | Pending |
