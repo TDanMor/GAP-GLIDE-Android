@@ -384,7 +384,8 @@ The agent must:
 ## 10. Current Next Actions
 
 1. Milestone 1.2: Structured 20-run-per-difficulty balance test.
-2. Milestone 2: Store-release preparation.
+2. Milestone 1.4: Sound effects and haptic feedback.
+3. Milestone 2: Store-release preparation.
 
 ## 11. Change Log
 
@@ -405,5 +406,6 @@ The agent must:
 | 2026-08-24 | Project documentation sync and baseline update. | Completed (b2ae1a1) |
 | 2026-08-24 | Milestone 1.3: UI safe-areas and button sizes polished for OnePlus 9. | Completed (d226a76) |
 | 2026-08-24 | Milestone 0.4: Signed release build configuration implemented. | Completed (fff2eaf) |
+| 2026-08-24 | Heritage Pixel Edition: 10 scenes (including Mizoram), 16 avatars, themed obstacles, and Exit Game button. | Completed (37c896c) |
 | TBD | Store-release assets. | Pending |
 | TBD | Internal test upload. | Pending |

@@ -139,5 +139,28 @@
 
 ---
 
-## Milestone 3 — Offline Content Expansion
+## Milestone 3 — Heritage Pixel Edition
+
+**Goal:** Transform the game into a cute, pixelated heritage-themed arcade experience.
+
+### 3.1 Architecture and Models
+- [x] Define `SceneType` enum with 10 heritage sites including **Mizoram, India** (37c896c).
+- [x] Define `AvatarType` enum with 16 cute pixel avatars (37c896c).
+- [x] Update `GameState` to track `selectedScene` and `selectedAvatar` (37c896c).
+
+### 3.2 Pixel Art Rendering
+- [x] Create `PixelArtLibrary.kt` for themed drawing (37c896c).
+- [x] Implement **Themed Backgrounds**: Heritage silhouettes and atmospheric skies (37c896c).
+- [x] Implement **Contextual Obstacles**: Bamboo for Mizoram, Marble for Taj Mahal (37c896c).
+- [x] Implement **Pixel Avatars**: Cute bird, funny cat, and original Nova (37c896c).
+
+### 3.3 UI and Persistence
+- [x] Add scrollable **Customization Hub** to Main Menu for scenes and avatars (37c896c).
+- [x] Add **Exit Game** button to Main Menu (37c896c).
+- [x] Persist user selections via Jetpack DataStore in `MainActivity.kt` (37c896c).
+- [x] Verified build success after the complete overhaul.
+
+**Milestone 3 completion gate:** The game is cute, funny, and features 10 selectable heritage environments and 16 characters with persistent choice.
+
+---
 ...
