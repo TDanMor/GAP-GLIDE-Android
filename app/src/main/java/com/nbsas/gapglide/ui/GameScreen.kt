@@ -177,7 +177,7 @@ fun GameScreen(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 120.sp
                 ),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.3f)
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )
         }
 
