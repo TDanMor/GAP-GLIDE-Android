@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
@@ -122,12 +123,33 @@ fun GameScreen(
                     )
                 }
 
-                // Draw Player
+                // Draw Player (Nova - Winged Orb)
+                val cx = size.width / 2
+                val cy = gameState.playerY
+                val radius = GameState.PLAYER_RADIUS
+
+                // Core Body
                 drawCircle(
                     color = playerColor,
-                    radius = GameState.PLAYER_RADIUS,
-                    center = Offset(size.width / 2, gameState.playerY)
+                    radius = radius,
+                    center = Offset(cx, cy)
                 )
+
+                // Wing Details (Symmetric, swept-back, inside radius)
+                val wingColor = Color.White.copy(alpha = 0.6f)
+                val wingPath = Path().apply {
+                    // Top Wing
+                    moveTo(cx + radius * 0.3f, cy - radius * 0.2f)
+                    lineTo(cx - radius * 0.7f, cy - radius * 0.5f)
+                    lineTo(cx - radius * 0.4f, cy - radius * 0.1f)
+                    close()
+                    // Bottom Wing
+                    moveTo(cx + radius * 0.3f, cy + radius * 0.2f)
+                    lineTo(cx - radius * 0.7f, cy + radius * 0.5f)
+                    lineTo(cx - radius * 0.4f, cy + radius * 0.1f)
+                    close()
+                }
+                drawPath(path = wingPath, color = wingColor)
             }
         }
 
