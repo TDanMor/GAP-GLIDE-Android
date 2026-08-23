@@ -51,14 +51,24 @@ object GameEngine {
 
         // Spawn a new obstacle if the last one has moved a certain distance
         val updatedObstacles = visibleObstacles.toMutableList()
-        val lastObstacleX = visibleObstacles.lastOrNull()?.x ?: 0f
+        val lastObstacle = visibleObstacles.lastOrNull()
+        val lastObstacleX = lastObstacle?.x ?: 0f
         
         // If no obstacles, or if the last obstacle has moved far enough from the right edge
         if (updatedObstacles.isEmpty() || screenWidth - lastObstacleX >= screenWidth * 0.6f) {
-            val minGapY = gapHeight / 2 + 100f
-            val maxGapY = screenHeight - (gapHeight / 2 + 100f)
-            val newGapY = if (maxGapY > minGapY) {
-                (minGapY.toInt()..maxGapY.toInt()).random().toFloat()
+            val absMinY = gapHeight / 2 + 100f
+            val absMaxY = screenHeight - (gapHeight / 2 + 100f)
+            
+            val newGapY = if (absMaxY > absMinY) {
+                if (lastObstacle == null) {
+                    // First obstacle: unrestricted safe range
+                    (absMinY.toInt()..absMaxY.toInt()).random().toFloat()
+                } else {
+                    // Following obstacles: clamp to maxGapDelta
+                    val rangeMin = maxOf(absMinY, lastObstacle.gapY - state.difficulty.maxGapDelta)
+                    val rangeMax = minOf(absMaxY, lastObstacle.gapY + state.difficulty.maxGapDelta)
+                    (rangeMin.toInt()..rangeMax.toInt()).random().toFloat()
+                }
             } else {
                 screenHeight / 2
             }

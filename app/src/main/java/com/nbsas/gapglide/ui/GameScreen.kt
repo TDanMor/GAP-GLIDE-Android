@@ -1,5 +1,6 @@
 package com.nbsas.gapglide.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -57,6 +58,17 @@ fun GameScreen(
     // Sync highScore from external state
     LaunchedEffect(highScore) {
         gameState = gameState.copy(highScore = highScore)
+    }
+
+    // Handle Back button on Game Over
+    BackHandler(enabled = gameState.status == GameStatus.GAME_OVER) {
+        gameState = gameState.copy(
+            status = GameStatus.START,
+            currentScore = 0,
+            playerY = screenHeight / 2,
+            playerVelocity = 0f,
+            obstacles = emptyList()
+        )
     }
 
     // Game Loop
@@ -278,17 +290,36 @@ fun GameScreen(
                         fontSize = 20.sp,
                         color = Color.White.copy(alpha = 0.7f)
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
-                    Button(onClick = {
-                        gameState = gameState.copy(
-                            status = GameStatus.PLAYING,
-                            currentScore = 0,
-                            playerY = screenHeight / 2,
-                            playerVelocity = 0f,
-                            obstacles = emptyList()
-                        )
-                    }) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Button(
+                        onClick = {
+                            gameState = gameState.copy(
+                                status = GameStatus.PLAYING,
+                                currentScore = 0,
+                                playerY = screenHeight / 2,
+                                playerVelocity = 0f,
+                                obstacles = emptyList()
+                            )
+                        },
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
                         Text(text = "Restart", fontSize = 24.sp)
+                    }
+                    Button(
+                        onClick = {
+                            gameState = gameState.copy(
+                                status = GameStatus.START,
+                                currentScore = 0,
+                                playerY = screenHeight / 2,
+                                playerVelocity = 0f,
+                                obstacles = emptyList()
+                            )
+                        },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
+                    ) {
+                        Text(text = "Main Menu", fontSize = 24.sp)
                     }
                 }
             }

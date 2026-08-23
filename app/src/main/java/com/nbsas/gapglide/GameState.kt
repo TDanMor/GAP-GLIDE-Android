@@ -14,15 +14,22 @@ enum class Difficulty {
     val speed: Float
         get() = when (this) {
             EASY -> 250f
-            MEDIUM -> 400f
-            HARD -> 600f
+            MEDIUM -> 350f
+            HARD -> 480f
         }
 
     val gapHeight: Float
         get() = when (this) {
             EASY -> 500f
-            MEDIUM -> 380f
-            HARD -> 280f
+            MEDIUM -> 420f
+            HARD -> 340f
+        }
+
+    val maxGapDelta: Float
+        get() = when (this) {
+            EASY -> 250f
+            MEDIUM -> 300f
+            HARD -> 360f
         }
 }
 
