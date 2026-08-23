@@ -180,6 +180,7 @@ Definition of done:
 - [x] The game has been tested on at least one physical Android device.
 - [x] No blocking bugs are known.
 - [ ] A signed private-test APK has been installed and played.
+- [x] Verified source code has a private remote backup.
 
 ### Milestone 1 — Product Polish
 
@@ -383,9 +384,8 @@ The agent must:
 ## 10. Current Next Actions
 
 1. Milestone 1.3: Visual and UX Polish.
-2. Milestone 0.5: Private GitHub repository backup.
-3. Structured 20-run-per-difficulty balance test before public release.
-4. Milestone 0.4: Signed release APK (Deferred until after Milestone 1 polish).
+2. Structured 20-run-per-difficulty balance test before public release.
+3. Milestone 0.4: Signed release APK (Deferred until after Milestone 1 polish).
 
 ## 11. Change Log
 
@@ -400,5 +400,7 @@ The agent must:
 | 2026-08-23 | Milestone 1.2: Difficulty tuning, fair gaps, and main menu implemented and initial-tested on OnePlus 9; no bugs observed so far. | Completed (7457f41) |
 | 2026-08-23 | Fixed high-contrast Gap Glide palette implemented; dynamic colors disabled. | Completed (fe92bdd) |
 | 2026-08-24 | In-game score readability improved by increasing alpha to 0.7f. | Completed (cad6e23) |
+| 2026-08-24 | Milestone 0.5: Verified source code pushed to private GitHub repository. | Completed |
+| 2026-08-24 | Difficulty label added to Game Over screen. | Completed (9555fb5) |
 | TBD | Signed release APK. | Pending |
 | TBD | Private Git remote backup. | Pending |

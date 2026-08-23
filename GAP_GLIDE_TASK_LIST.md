@@ -63,11 +63,11 @@
 
 ### 0.5 Remote Backup
 
-- [ ] Create a private GitHub repository named `gap-glide`.
-- [ ] Confirm the remote repository starts empty: do not create a remote README, `.gitignore`, or licence.
-- [ ] Add the remote only after reviewing the exact repository URL.
-- [ ] Push verified local Git history.
-- [ ] Confirm no APK, AAB, keystore, passwords, build folders, or `local.properties` appear on GitHub.
+- [x] Create a private GitHub repository named `gap-glide`.
+- [x] Confirm the remote repository starts empty: do not create a remote README, `.gitignore`, or licence.
+- [x] Add the remote only after reviewing the exact repository URL.
+- [x] Push verified local Git history.
+- [x] Confirm no APK, AAB, keystore, passwords, build folders, or `local.properties` appear on GitHub.
 
 **Milestone 0 completion gate:** A signed release APK works on a real device, the master plan is updated, and the verified source code has a private remote backup.
 
@@ -99,7 +99,7 @@
 
 - [x] Improve background, obstacle, player, score, and overlay colours (fixed palette, disabled dynamic colors).
 - [x] Verify high text contrast and readable score display (increased alpha to 0.7f).
-- [ ] Improve Start and Game Over overlay wording.
+- [x] Improve Start and Game Over overlay wording (Added difficulty label to Game Over).
 - [ ] Ensure buttons are large enough and within safe areas.
 - [ ] Test on at least one phone after each UI change.
 
