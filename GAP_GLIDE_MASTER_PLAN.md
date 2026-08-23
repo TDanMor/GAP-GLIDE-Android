@@ -398,5 +398,7 @@ The agent must:
 | 2026-08-23 | Physical-device validation on OnePlus 9: Pass. No bugs observed. | Completed |
 | 2026-08-23 | Custom adaptive launcher icon implemented and verified on OnePlus 9. | Completed |
 | 2026-08-23 | Milestone 1.2: Difficulty tuning, fair gaps, and main menu implemented and initial-tested on OnePlus 9; no bugs observed so far. | Completed (7457f41) |
+| 2026-08-23 | Fixed high-contrast Gap Glide palette implemented; dynamic colors disabled. | Completed (fe92bdd) |
+| 2026-08-24 | In-game score readability improved by increasing alpha to 0.7f. | Completed (cad6e23) |
 | TBD | Signed release APK. | Pending |
 | TBD | Private Git remote backup. | Pending |

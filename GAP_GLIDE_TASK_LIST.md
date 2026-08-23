@@ -97,8 +97,8 @@
 
 ### 1.3 Visual and UX Polish
 
-- [ ] Improve background, obstacle, player, score, and overlay colours.
-- [ ] Verify high text contrast and readable score display.
+- [x] Improve background, obstacle, player, score, and overlay colours (fixed palette, disabled dynamic colors).
+- [x] Verify high text contrast and readable score display (increased alpha to 0.7f).
 - [ ] Improve Start and Game Over overlay wording.
 - [ ] Ensure buttons are large enough and within safe areas.
 - [ ] Test on at least one phone after each UI change.
