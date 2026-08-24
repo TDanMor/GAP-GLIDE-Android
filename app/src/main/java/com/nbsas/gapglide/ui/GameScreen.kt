@@ -69,6 +69,7 @@ fun GameScreen(
     initialSound: Boolean = true,
     initialGraceMode: Boolean = false,
     leaderboard: List<ScoreEntry> = emptyList(),
+    multiplayerManager: MultiplayerManager? = null,
     onNewHighScore: (Int, String) -> Unit = { _, _ -> },
     onNameChanged: (String) -> Unit = {},
     onSceneChanged: (SceneType) -> Unit = {},
@@ -98,6 +99,9 @@ fun GameScreen(
     var countdownValue by remember { mutableStateOf(3) }
     var menuAnimOffset by remember { mutableStateOf(0f) }
     var isPaused by remember { mutableStateOf(false) }
+
+    val connectedEndpoints by multiplayerManager?.connectedEndpoints?.collectAsState() ?: remember { mutableStateOf(emptyMap()) }
+    val incomingMessage by multiplayerManager?.messages?.collectAsState() ?: remember { mutableStateOf(null) }
 
     val scoreScale = remember { Animatable(1f) }
     val scope = rememberCoroutineScope()
@@ -167,6 +171,54 @@ fun GameScreen(
         }
     }
 
+    LaunchedEffect(incomingMessage) {
+        val (id, msg) = incomingMessage ?: return@LaunchedEffect
+        val parts = msg.split(":")
+        when (parts[0]) {
+            "START" -> {
+                if (gameState.multiplayerMode == MultiplayerMode.CLIENT) {
+                    gameState = gameState.copy(
+                        status = GameStatus.COUNTDOWN,
+                        currentScore = 0,
+                        playerY = screenHeight / 2,
+                        playerVelocity = 0f,
+                        obstacles = emptyList(),
+                        lives = if (gameState.graceModeEnabled) GameEngine.MAX_LIVES else 1,
+                        invincibilityTimer = 0f
+                    )
+                }
+            }
+            "SPAWN" -> {
+                if (gameState.multiplayerMode == MultiplayerMode.CLIENT) {
+                    val gapY = parts[1].toFloat()
+                    gameState = gameState.copy(
+                        obstacles = gameState.obstacles + Obstacle(x = screenWidth + 50f, gapY = gapY)
+                    )
+                }
+            }
+            "SYNC" -> {
+                val y = parts[1].toFloat()
+                val isDead = parts[2].toBoolean()
+                val score = parts[3].toInt()
+                val avatarName = parts[4]
+                val name = parts.getOrNull(5) ?: "Player"
+                
+                val avatar = try { AvatarType.valueOf(avatarName) } catch(e: Exception) { AvatarType.NOVA }
+                
+                val currentRemote = gameState.remotePlayers.toMutableList()
+                val index = currentRemote.indexOfFirst { it.id == id }
+                val updatedPlayer = RemotePlayer(id, name, y, avatar, isDead, score)
+                
+                if (index != null && index != -1) {
+                    currentRemote[index] = updatedPlayer
+                } else {
+                    currentRemote.add(updatedPlayer)
+                }
+                gameState = gameState.copy(remotePlayers = currentRemote)
+            }
+        }
+    }
+
     LaunchedEffect(gameState.status, isPaused) {
         if (isPaused) return@LaunchedEffect
         if (gameState.status == GameStatus.COUNTDOWN) {
@@ -178,14 +230,65 @@ fun GameScreen(
         }
 
         if (gameState.status == GameStatus.PLAYING) {
+            if (gameState.multiplayerMode == MultiplayerMode.HOST) {
+                multiplayerManager?.broadcast("START")
+            }
+            
             var lastTime = withFrameNanos { it }
+            var syncTicker = 0f
+            
             while (gameState.status == GameStatus.PLAYING && !isPaused) {
                 withFrameNanos { time ->
                     val dt = (time - lastTime) / 1_000_000_000f
                     lastTime = time
                     
+                    syncTicker += dt
+                    if (syncTicker > 0.05f) { // 20 FPS sync
+                        syncTicker = 0f
+                        val syncMsg = "SYNC:${gameState.playerY}:${gameState.status == GameStatus.GAME_OVER}:${gameState.currentScore}:${gameState.selectedAvatar.name}:${gameState.playerName}"
+                        multiplayerManager?.broadcast(syncMsg)
+                    }
+                    
                     var nextState = GameEngine.updatePlayer(gameState, dt, screenHeight)
-                    nextState = GameEngine.updateObstacles(nextState, dt, screenWidth, screenHeight)
+                    
+                    // Obstacle update with Host/Client logic
+                    val moveSpeed = nextState.difficulty.speed
+                    val newObstacles = nextState.obstacles.map { it.copy(x = it.x - moveSpeed * dt) }.toMutableList()
+
+                    var newScore = nextState.currentScore
+                    var livesGained = 0
+                    
+                    newObstacles.forEachIndexed { index, obstacle ->
+                        if (!obstacle.isPassed && obstacle.x + GameState.OBSTACLE_WIDTH < screenWidth / 2) {
+                            newObstacles[index] = obstacle.copy(isPassed = true)
+                            newScore++
+                            if (nextState.graceModeEnabled && nextState.lives < GameEngine.MAX_LIVES && newScore % 10 == 0) {
+                                livesGained = 1
+                            }
+                        }
+                    }
+
+                    newObstacles.removeAll { it.x + GameState.OBSTACLE_WIDTH < -50f }
+
+                    if (nextState.multiplayerMode != MultiplayerMode.CLIENT) {
+                        if (newObstacles.isEmpty() || newObstacles.last().x < screenWidth - 650f) {
+                            val lastY = if (newObstacles.isEmpty()) screenHeight / 2 else newObstacles.last().gapY
+                            val nextY = (lastY + kotlin.random.Random.nextFloat() * nextState.difficulty.maxGapDelta * 2 - nextState.difficulty.maxGapDelta)
+                                .coerceIn(250f, screenHeight - 250f)
+                            
+                            newObstacles.add(Obstacle(x = screenWidth + 50f, gapY = nextY))
+                            if (nextState.multiplayerMode == MultiplayerMode.HOST) {
+                                multiplayerManager?.broadcast("SPAWN:$nextY")
+                            }
+                        }
+                    }
+
+                    nextState = nextState.copy(
+                        obstacles = newObstacles, 
+                        currentScore = newScore,
+                        lives = nextState.lives + livesGained,
+                        timeOfDay = (newScore % 40) / 40f
+                    )
                     
                     if (nextState.currentScore > gameState.currentScore) {
                         if (nextState.soundEnabled) GameAudioManager.playScoreSound()
@@ -344,6 +447,33 @@ fun GameScreen(
                         )
                     }
 
+                    // Render Remote Players
+                    gameState.remotePlayers.forEach { remote ->
+                        if (!remote.isDead) {
+                            withTransform({
+                                translate(top = remote.y - gameState.playerY) // Relative to local player? No, Canvas is absolute screen space.
+                                // Actually player is fixed at screenWidth/2, playerY.
+                            }) {
+                                drawImage(
+                                    image = getAvatarSprite(remote.avatar, GameState.PLAYER_RADIUS, density),
+                                    dstOffset = IntOffset(
+                                        (size.width / 2 - GameState.PLAYER_RADIUS).toInt(),
+                                        (remote.y - GameState.PLAYER_RADIUS).toInt()
+                                    ),
+                                    alpha = 0.5f
+                                )
+                                drawIntoCanvas { canvas ->
+                                    canvas.nativeCanvas.drawText(
+                                        remote.name,
+                                        size.width / 2,
+                                        remote.y - GameState.PLAYER_RADIUS - 10f,
+                                        namePaint
+                                    )
+                                }
+                            }
+                        }
+                    }
+
                     drawIntoCanvas { canvas ->
                         canvas.nativeCanvas.drawText(
                             gameState.playerName,
@@ -415,6 +545,25 @@ fun GameScreen(
                 fontWeight = FontWeight.Bold,
                 color = Color.White.copy(alpha = 0.5f)
             )
+        }
+
+        if (gameState.multiplayerMode != MultiplayerMode.NONE && gameState.status == GameStatus.PLAYING) {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .safeDrawingPadding()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.End
+            ) {
+                gameState.remotePlayers.sortedByDescending { it.score }.forEach { remote ->
+                    Text(
+                        text = "${remote.name}: ${remote.score}",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (remote.isDead) Color.Red.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.8f)
+                    )
+                }
+            }
         }
 
         milestoneMessage?.let {
@@ -494,6 +643,69 @@ fun GameScreen(
                     Spacer(modifier = Modifier.height(12.dp))
                     Button(onClick = { isLeaderboardOpen = true }, modifier = Modifier.height(48.dp).fillMaxWidth(), shape = RoundedCornerShape(24.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF03A9F4))) {
                         Text(text = "🏆 LEADERBOARD", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(
+                            onClick = { 
+                                gameState = gameState.copy(multiplayerMode = MultiplayerMode.HOST)
+                                multiplayerManager?.startHosting(gameState.playerName)
+                            }, 
+                            modifier = Modifier.height(48.dp).weight(1f), 
+                            shape = RoundedCornerShape(24.dp), 
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF9800))
+                        ) {
+                            Text(text = "🏠 HOST", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                        Button(
+                            onClick = { 
+                                gameState = gameState.copy(multiplayerMode = MultiplayerMode.CLIENT)
+                                multiplayerManager?.startJoining(gameState.playerName)
+                            }, 
+                            modifier = Modifier.height(48.dp).weight(1f), 
+                            shape = RoundedCornerShape(24.dp), 
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE91E63))
+                        ) {
+                            Text(text = "🤝 JOIN", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        }
+                    }
+
+                    if (gameState.multiplayerMode != MultiplayerMode.NONE) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                                .padding(12.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = if (gameState.multiplayerMode == MultiplayerMode.HOST) "HOSTING SESSION" else "JOINING...",
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 12.sp
+                            )
+                            Text(
+                                text = "${connectedEndpoints.size} Players Connected",
+                                color = Color.White.copy(alpha = 0.7f),
+                                fontSize = 11.sp
+                            )
+                            connectedEndpoints.values.forEach { 
+                                Text(it, color = Color.White, fontSize = 10.sp)
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Button(
+                                onClick = { 
+                                    multiplayerManager?.stopAll()
+                                    gameState = gameState.copy(multiplayerMode = MultiplayerMode.NONE, remotePlayers = emptyList())
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(alpha = 0.5f)),
+                                modifier = Modifier.height(32.dp)
+                            ) {
+                                Text("CANCEL", fontSize = 10.sp)
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(16.dp))

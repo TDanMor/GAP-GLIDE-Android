@@ -2,10 +2,26 @@ package com.nbsas.gapglide
 
 enum class GameStatus {
     START,
+    LOBBY,
     COUNTDOWN,
     PLAYING,
     GAME_OVER
 }
+
+enum class MultiplayerMode {
+    NONE,
+    HOST,
+    CLIENT
+}
+
+data class RemotePlayer(
+    val id: String,
+    val name: String,
+    val y: Float,
+    val avatar: AvatarType,
+    val isDead: Boolean = false,
+    val score: Int = 0
+)
 
 enum class Difficulty {
     EASY,
@@ -93,6 +109,9 @@ data class GameState(
     val difficulty: Difficulty = Difficulty.MEDIUM,
     val selectedScene: SceneType = SceneType.TAJ_MAHAL,
     val selectedAvatar: AvatarType = AvatarType.NOVA,
+    val multiplayerMode: MultiplayerMode = MultiplayerMode.NONE,
+    val remotePlayers: List<RemotePlayer> = emptyList(),
+    val hostEndpointId: String? = null,
     val vibrationEnabled: Boolean = true,
     val soundEnabled: Boolean = true,
     val graceModeEnabled: Boolean = false,

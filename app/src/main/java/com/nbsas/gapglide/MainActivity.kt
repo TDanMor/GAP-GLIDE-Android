@@ -1,12 +1,16 @@
 package com.nbsas.gapglide
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
+import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -23,6 +27,34 @@ import kotlinx.coroutines.launch
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class MainActivity : ComponentActivity() {
+
+    private val multiplayerManager by lazy { MultiplayerManager(this) }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        // Handle permissions result if needed
+    }
+
+    private fun checkAndRequestPermissions() {
+        val permissions = mutableListOf<String>()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            permissions.add(Manifest.permission.BLUETOOTH_SCAN)
+            permissions.add(Manifest.permission.BLUETOOTH_ADVERTISE)
+            permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+        }
+        permissions.add(Manifest.permission.ACCESS_FINE_LOCATION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.NEARBY_WIFI_DEVICES)
+        }
+
+        val missing = permissions.filter {
+            ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED
+        }
+        if (missing.isNotEmpty()) {
+            requestPermissionLauncher.launch(missing.toTypedArray())
+        }
+    }
 
     private val highScoreKey = intPreferencesKey("high_score")
     private val playerNameKey = stringPreferencesKey("player_name")
@@ -78,6 +110,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        checkAndRequestPermissions()
 
         setContent {
             val settings by settingsFlow.collectAsState(initial = Settings(0, "Hero", SceneType.TAJ_MAHAL, AvatarType.NOVA, true, true, false, emptyList()))
@@ -91,6 +124,7 @@ class MainActivity : ComponentActivity() {
                     initialSound = settings.soundEnabled,
                     initialGraceMode = settings.graceMode,
                     leaderboard = settings.leaderboard,
+                    multiplayerManager = multiplayerManager,
                     onNewHighScore = { newScore, name ->
                         saveHighScore(name, newScore)
                     },
