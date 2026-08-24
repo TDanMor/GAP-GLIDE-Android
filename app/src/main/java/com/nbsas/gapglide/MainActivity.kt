@@ -29,6 +29,9 @@ class MainActivity : ComponentActivity() {
     private val selectedSceneKey = stringPreferencesKey("selected_scene")
     private val selectedAvatarKey = stringPreferencesKey("selected_avatar")
     private val vibrationEnabledKey = booleanPreferencesKey("vibration_enabled")
+    private val soundEnabledKey = booleanPreferencesKey("sound_enabled")
+    private val graceModeKey = booleanPreferencesKey("grace_mode")
+    private val leaderboardKey = stringPreferencesKey("leaderboard")
 
     private val settingsFlow by lazy {
         dataStore.data.map { preferences ->
@@ -37,13 +40,26 @@ class MainActivity : ComponentActivity() {
             val sceneName = preferences[selectedSceneKey] ?: SceneType.TAJ_MAHAL.name
             val avatarName = preferences[selectedAvatarKey] ?: AvatarType.NOVA.name
             val vibrationEnabled = preferences[vibrationEnabledKey] ?: true
+            val soundEnabled = preferences[soundEnabledKey] ?: true
+            val graceMode = preferences[graceModeKey] ?: false
+            val leaderboardStr = preferences[leaderboardKey] ?: ""
             
+            val leaderboard = leaderboardStr.split("|")
+                .filter { it.isNotEmpty() }
+                .map { 
+                    val parts = it.split(":")
+                    ScoreEntry(parts[0], parts[1].toInt(), "") 
+                }
+
             Settings(
                 highScore,
                 playerName,
                 try { SceneType.valueOf(sceneName) } catch (e: Exception) { SceneType.TAJ_MAHAL },
                 try { AvatarType.valueOf(avatarName) } catch (e: Exception) { AvatarType.NOVA },
-                vibrationEnabled
+                vibrationEnabled,
+                soundEnabled,
+                graceMode,
+                leaderboard
             )
         }
     }
@@ -53,7 +69,10 @@ class MainActivity : ComponentActivity() {
         val playerName: String, 
         val scene: SceneType, 
         val avatar: AvatarType,
-        val vibrationEnabled: Boolean
+        val vibrationEnabled: Boolean,
+        val soundEnabled: Boolean,
+        val graceMode: Boolean,
+        val leaderboard: List<ScoreEntry>
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +80,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val settings by settingsFlow.collectAsState(initial = Settings(0, "Hero", SceneType.TAJ_MAHAL, AvatarType.NOVA, true))
+            val settings by settingsFlow.collectAsState(initial = Settings(0, "Hero", SceneType.TAJ_MAHAL, AvatarType.NOVA, true, true, false, emptyList()))
             GapGlideTheme {
                 GameScreen(
                     highScore = settings.highScore,
@@ -69,8 +88,11 @@ class MainActivity : ComponentActivity() {
                     initialScene = settings.scene,
                     initialAvatar = settings.avatar,
                     initialVibration = settings.vibrationEnabled,
-                    onNewHighScore = { newScore ->
-                        saveHighScore(newScore)
+                    initialSound = settings.soundEnabled,
+                    initialGraceMode = settings.graceMode,
+                    leaderboard = settings.leaderboard,
+                    onNewHighScore = { newScore, name ->
+                        saveHighScore(name, newScore)
                     },
                     onNameChanged = { name ->
                         saveSetting(playerNameKey, name)
@@ -83,19 +105,39 @@ class MainActivity : ComponentActivity() {
                     },
                     onVibrationChanged = { enabled ->
                         saveSetting(vibrationEnabledKey, enabled)
+                    },
+                    onSoundChanged = { enabled ->
+                        saveSetting(soundEnabledKey, enabled)
+                    },
+                    onGraceModeChanged = { enabled ->
+                        saveSetting(graceModeKey, enabled)
                     }
                 )
             }
         }
     }
 
-    private fun saveHighScore(score: Int) {
+    private fun saveHighScore(name: String, score: Int) {
         lifecycleScope.launch {
             dataStore.edit { settings ->
+                // Global high score
                 val currentHigh = settings[highScoreKey] ?: 0
                 if (score > currentHigh) {
                     settings[highScoreKey] = score
                 }
+
+                // Leaderboard
+                val currentBoardStr = settings[leaderboardKey] ?: ""
+                val currentBoard = currentBoardStr.split("|")
+                    .filter { it.isNotEmpty() }
+                    .map { 
+                        val parts = it.split(":")
+                        ScoreEntry(parts[0], parts[1].toInt(), "") 
+                    }.toMutableList()
+                
+                currentBoard.add(ScoreEntry(name, score, ""))
+                val newBoard = currentBoard.sortedByDescending { it.score }.take(5)
+                settings[leaderboardKey] = newBoard.joinToString("|") { "${it.name}:${it.score}" }
             }
         }
     }
