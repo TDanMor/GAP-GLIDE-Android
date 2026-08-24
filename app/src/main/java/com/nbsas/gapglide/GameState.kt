@@ -2,6 +2,7 @@ package com.nbsas.gapglide
 
 enum class GameStatus {
     START,
+    COUNTDOWN,
     PLAYING,
     GAME_OVER
 }
@@ -48,21 +49,21 @@ enum class SceneType(val displayName: String) {
 
 enum class AvatarType(val displayName: String) {
     PIP("Pip"),
-    EMBER("Ember"),
-    BLIP("Blip"),
-    ZEPHYR("Zephyr"),
     MOMO("Momo"),
     WAFFLE("Waffle"),
     SNUG("Snug"),
+    EMBER("Ember"),
     NIMBUS("Nimbus"),
     STARBIT("Star-bit"),
     LUNA("Luna"),
+    BLIP("Blip"),
     GIZMO("Gizmo"),
     SPROCKET("Sprocket"),
+    ZEPHYR("Zephyr"),
+    FIZZ("Fizz"),
+    PEBBLE("Pebble"),
     NOVA("Nova"),
-    TIGER("Cute Tiger"),
-    PANDA("Chubby Panda"),
-    MONKEY("Cheeky Monkey")
+    TIGER("Cute Tiger")
 }
 
 data class Obstacle(val x: Float, val gapY: Float, val isPassed: Boolean = false)
@@ -71,12 +72,14 @@ data class GameState(
     val status: GameStatus = GameStatus.START,
     val currentScore: Int = 0,
     val highScore: Int = 0,
+    val playerName: String = "Player",
     val playerY: Float = 0f,
     val playerVelocity: Float = 0f,
     val obstacles: List<Obstacle> = emptyList(),
     val difficulty: Difficulty = Difficulty.MEDIUM,
     val selectedScene: SceneType = SceneType.TAJ_MAHAL,
-    val selectedAvatar: AvatarType = AvatarType.NOVA
+    val selectedAvatar: AvatarType = AvatarType.NOVA,
+    val vibrationEnabled: Boolean = true
 ) {
     companion object {
         const val PLAYER_RADIUS = 50f
