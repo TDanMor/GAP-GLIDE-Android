@@ -407,5 +407,6 @@ The agent must:
 | 2026-08-24 | Milestone 1.3: UI safe-areas and button sizes polished for OnePlus 9. | Completed (d226a76) |
 | 2026-08-24 | Milestone 0.4: Signed release build configuration implemented. | Completed (fff2eaf) |
 | 2026-08-24 | Heritage Pixel Edition: 10 scenes (including Mizoram), 16 avatars, themed obstacles, and Exit Game button. | Completed (37c896c) |
+| 2026-08-24 | Grid-based scene and character pickers with cute names and icons implemented. | Completed (a9c711c) |
 | TBD | Store-release assets. | Pending |
 | TBD | Internal test upload. | Pending |

@@ -156,9 +156,10 @@
 
 ### 3.3 UI and Persistence
 - [x] Add scrollable **Customization Hub** to Main Menu for scenes and avatars (37c896c).
+- [x] Implement **Grid-based Pickers** for Scenes and Characters with cute names and previews (a9c711c).
 - [x] Add **Exit Game** button to Main Menu (37c896c).
 - [x] Persist user selections via Jetpack DataStore in `MainActivity.kt` (37c896c).
-- [x] Verified build success after the complete overhaul.
+- [x] Verified build success after the grid picker overhaul.
 
 **Milestone 3 completion gate:** The game is cute, funny, and features 10 selectable heritage environments and 16 characters with persistent choice.
 
