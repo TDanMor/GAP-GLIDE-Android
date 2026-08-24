@@ -12,20 +12,34 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,6 +91,8 @@ fun GameScreen(
     }
     var screenWidth by remember { mutableStateOf(0f) }
     var screenHeight by remember { mutableStateOf(0f) }
+    var isScenePickerOpen by remember { mutableStateOf(false) }
+    var isAvatarPickerOpen by remember { mutableStateOf(false) }
 
     // Sync highScore from external state
     LaunchedEffect(highScore) {
@@ -84,14 +100,20 @@ fun GameScreen(
     }
 
     // Handle Back button on Game Over
-    BackHandler(enabled = gameState.status == GameStatus.GAME_OVER) {
-        gameState = gameState.copy(
-            status = GameStatus.START,
-            currentScore = 0,
-            playerY = screenHeight / 2,
-            playerVelocity = 0f,
-            obstacles = emptyList()
-        )
+    BackHandler(enabled = gameState.status == GameStatus.GAME_OVER || isScenePickerOpen || isAvatarPickerOpen) {
+        if (isScenePickerOpen) {
+            isScenePickerOpen = false
+        } else if (isAvatarPickerOpen) {
+            isAvatarPickerOpen = false
+        } else {
+            gameState = gameState.copy(
+                status = GameStatus.START,
+                currentScore = 0,
+                playerY = screenHeight / 2,
+                playerVelocity = 0f,
+                obstacles = emptyList()
+            )
+        }
     }
 
     // Game Loop
@@ -241,7 +263,7 @@ fun GameScreen(
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                                 ),
-                                contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
                             ) {
                                 Text(
                                     text = difficulty.name,
@@ -255,67 +277,31 @@ fun GameScreen(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     // Scene Selection
-                    Text(
-                        text = "Choose Scene",
-                        fontSize = 14.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(
+                    Button(
+                        onClick = { isScenePickerOpen = true },
                         modifier = Modifier
-                            .widthIn(max = 300.dp)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            .heightIn(min = 48.dp)
+                            .widthIn(min = 200.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary
+                        )
                     ) {
-                        SceneType.entries.forEach { scene ->
-                            val isSelected = gameState.selectedScene == scene
-                            Button(
-                                onClick = { 
-                                    gameState = gameState.copy(selectedScene = scene)
-                                    onSceneChanged(scene)
-                                },
-                                modifier = Modifier.heightIn(min = 40.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (isSelected) MaterialTheme.colorScheme.secondary else Color.DarkGray
-                                )
-                            ) {
-                                Text(text = scene.displayName, fontSize = 12.sp)
-                            }
-                        }
+                        Text(text = "Scene: ${gameState.selectedScene.displayName}", fontSize = 16.sp)
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Avatar Selection
-                    Text(
-                        text = "Choose Character",
-                        fontSize = 14.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(
+                    Button(
+                        onClick = { isAvatarPickerOpen = true },
                         modifier = Modifier
-                            .widthIn(max = 300.dp)
-                            .horizontalScroll(rememberScrollState()),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            .heightIn(min = 48.dp)
+                            .widthIn(min = 200.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.tertiary
+                        )
                     ) {
-                        AvatarType.entries.forEach { avatar ->
-                            val isSelected = gameState.selectedAvatar == avatar
-                            Button(
-                                onClick = { 
-                                    gameState = gameState.copy(selectedAvatar = avatar)
-                                    onAvatarChanged(avatar)
-                                },
-                                modifier = Modifier.heightIn(min = 40.dp),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (isSelected) MaterialTheme.colorScheme.tertiary else Color.DarkGray
-                                )
-                            ) {
-                                Text(text = avatar.displayName, fontSize = 12.sp)
-                            }
-                        }
+                        Text(text = "Character: ${gameState.selectedAvatar.displayName}", fontSize = 16.sp)
                     }
 
                     Spacer(modifier = Modifier.height(24.dp))
@@ -431,6 +417,150 @@ fun GameScreen(
                         Text(text = "Main Menu", fontSize = 24.sp)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+        }
+
+        // Scene Picker Overlay
+        AnimatedVisibility(
+            visible = isScenePickerOpen,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            PickerOverlay(
+                title = "Choose Scene",
+                items = SceneType.entries,
+                selectedItem = gameState.selectedScene,
+                onItemSelected = {
+                    gameState = gameState.copy(selectedScene = it)
+                    onSceneChanged(it)
+                    isScenePickerOpen = false
+                },
+                onClose = { isScenePickerOpen = false },
+                itemContent = { scene ->
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Canvas(modifier = Modifier.size(60.dp)) {
+                            drawHeritageBackground(scene)
+                        }
+                    }
+                },
+                itemLabel = { it.displayName }
+            )
+        }
+
+        // Avatar Picker Overlay
+        AnimatedVisibility(
+            visible = isAvatarPickerOpen,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            PickerOverlay(
+                title = "Choose Character",
+                items = AvatarType.entries,
+                selectedItem = gameState.selectedAvatar,
+                onItemSelected = {
+                    gameState = gameState.copy(selectedAvatar = it)
+                    onAvatarChanged(it)
+                    isAvatarPickerOpen = false
+                },
+                onClose = { isAvatarPickerOpen = false },
+                itemContent = { avatar ->
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Canvas(modifier = Modifier.size(40.dp)) {
+                            drawAvatar(avatar, size.width / 2, size.height / 2, size.width / 2.5f)
+                        }
+                    }
+                },
+                itemLabel = { it.displayName }
+            )
+        }
+    }
+}
+
+@Composable
+fun <T> PickerOverlay(
+    title: String,
+    items: List<T>,
+    selectedItem: T,
+    onItemSelected: (T) -> Unit,
+    onClose: () -> Unit,
+    itemContent: @Composable (T) -> Unit,
+    itemLabel: (T) -> String
+) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color.Black.copy(alpha = 0.9f)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .safeDrawingPadding()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+                Button(onClick = onClose) {
+                    Text("Close")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.weight(1f)
+            ) {
+                items(items) { item ->
+                    val isSelected = item == selectedItem
+                    Card(
+                        onClick = { onItemSelected(item) },
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .then(
+                                if (isSelected) Modifier.background(
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                                    RoundedCornerShape(12.dp)
+                                ) else Modifier
+                            ),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color.DarkGray.copy(alpha = 0.5f)
+                        ),
+                        border = if (isSelected) androidx.compose.foundation.BorderStroke(
+                            width = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        ) else null
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxSize().padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Box(modifier = Modifier.weight(1f)) {
+                                itemContent(item)
+                            }
+                            Text(
+                                text = itemLabel(item),
+                                fontSize = 12.sp,
+                                color = Color.White,
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                maxLines = 1
+                            )
+                        }
+                    }
                 }
             }
         }

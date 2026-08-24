@@ -47,21 +47,21 @@ enum class SceneType(val displayName: String) {
 }
 
 enum class AvatarType(val displayName: String) {
+    PIP("Pip"),
+    EMBER("Ember"),
+    BLIP("Blip"),
+    ZEPHYR("Zephyr"),
+    MOMO("Momo"),
+    WAFFLE("Waffle"),
+    SNUG("Snug"),
+    NIMBUS("Nimbus"),
+    STARBIT("Star-bit"),
+    LUNA("Luna"),
+    GIZMO("Gizmo"),
+    SPROCKET("Sprocket"),
     NOVA("Nova"),
-    BIRD("Pixel Bird"),
-    CAT("Funny Cat"),
-    ROBOT("Retro Robot"),
-    ELEPHANT("Tiny Elephant"),
     TIGER("Cute Tiger"),
-    DRAGON("Tiny Dragon"),
     PANDA("Chubby Panda"),
-    ALIEN("Space Alien"),
-    GHOST("Spooky Ghost"),
-    DOG("Happy Dog"),
-    BUNNY("Quick Bunny"),
-    FROG("Leap Frog"),
-    FOX("Cunning Fox"),
-    KOALA("Sleepy Koala"),
     MONKEY("Cheeky Monkey")
 }
 

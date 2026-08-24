@@ -3,6 +3,7 @@ package com.nbsas.gapglide.ui
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import com.nbsas.gapglide.AvatarType
 import com.nbsas.gapglide.SceneType
@@ -79,26 +80,62 @@ object PixelArtLibrary {
 
     fun DrawScope.drawAvatar(avatar: AvatarType, x: Float, y: Float, radius: Float) {
         when (avatar) {
+            AvatarType.PIP -> {
+                // Pink orb with big eye
+                drawCircle(Color(0xFFFF80AB), radius, Offset(x, y))
+                drawCircle(Color.White, radius * 0.4f, Offset(x + radius * 0.3f, y - radius * 0.2f))
+                drawCircle(Color.Black, radius * 0.2f, Offset(x + radius * 0.4f, y - radius * 0.2f))
+            }
+            AvatarType.EMBER -> {
+                // Orange bird
+                drawCircle(Color(0xFFFF9800), radius, Offset(x, y))
+                // Eye
+                drawCircle(Color.White, radius * 0.3f, Offset(x + radius * 0.4f, y - radius * 0.3f))
+                drawCircle(Color.Black, radius * 0.15f, Offset(x + radius * 0.5f, y - radius * 0.3f))
+                // Beak
+                val path = Path().apply {
+                    moveTo(x + radius * 0.8f, y)
+                    lineTo(x + radius * 1.3f, y + radius * 0.2f)
+                    lineTo(x + radius * 0.8f, y + radius * 0.4f)
+                    close()
+                }
+                drawPath(path, Color(0xFFFFEB3B))
+            }
+            AvatarType.BLIP -> {
+                // Teal robot
+                val rectSize = radius * 1.6f
+                drawRect(Color(0xFF4DB6AC), Offset(x - rectSize / 2, y - rectSize / 2), Size(rectSize, rectSize))
+                // Eyes
+                drawCircle(Color.White, radius * 0.25f, Offset(x - radius * 0.35f, y))
+                drawCircle(Color.White, radius * 0.25f, Offset(x + radius * 0.35f, y))
+                drawCircle(Color.Black, radius * 0.1f, Offset(x - radius * 0.35f, y))
+                drawCircle(Color.Black, radius * 0.1f, Offset(x + radius * 0.35f, y))
+                // Antenna
+                drawRect(Color(0xFF4DB6AC), Offset(x - 5f, y - rectSize / 2 - 15f), Size(10f, 15f))
+                drawCircle(Color.Yellow, 8f, Offset(x, y - rectSize / 2 - 20f))
+            }
+            AvatarType.ZEPHYR -> {
+                // Yellow triangular bird/plane
+                val path = Path().apply {
+                    moveTo(x + radius * 1.2f, y)
+                    lineTo(x - radius * 0.8f, y - radius * 0.8f)
+                    lineTo(x - radius * 0.8f, y + radius * 0.8f)
+                    close()
+                }
+                drawPath(path, Color(0xFFD4C26A))
+                // Eye
+                drawCircle(Color.Black, radius * 0.15f, Offset(x + radius * 0.2f, y - radius * 0.1f))
+            }
             AvatarType.NOVA -> {
                 drawCircle(Color(0xFFEFB8C8), radius, Offset(x, y))
                 // Simple wings
                 drawRect(Color.White.copy(alpha = 0.5f), Offset(x - radius * 1.5f, y - 10f), Size(radius, 20f))
                 drawRect(Color.White.copy(alpha = 0.5f), Offset(x + radius * 0.5f, y - 10f), Size(radius, 20f))
             }
-            AvatarType.CAT -> {
-                drawRect(Color(0xFFFFB74D), Offset(x - radius, y - radius), Size(radius * 2, radius * 2))
-                // Ears
-                drawRect(Color(0xFFFFB74D), Offset(x - radius, y - radius - 10f), Size(10f, 10f))
-                drawRect(Color(0xFFFFB74D), Offset(x + radius - 10f, y - radius - 10f), Size(10f, 10f))
-            }
-            AvatarType.BIRD -> {
-                drawRect(Color.Yellow, Offset(x - radius, y - radius), Size(radius * 2, radius * 2))
-                // Beak
-                drawRect(Color.Red, Offset(x + radius - 5f, y - 5f), Size(10f, 10f))
-            }
             else -> {
-                // Default blocky avatar
-                drawRect(Color.White, Offset(x - radius, y - radius), Size(radius * 2, radius * 2))
+                // Default blocky avatar for others
+                drawCircle(Color.Gray, radius, Offset(x, y))
+                drawCircle(Color.White, radius * 0.3f, Offset(x + radius * 0.4f, y - radius * 0.2f))
             }
         }
     }
